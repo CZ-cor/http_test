@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+<video id="video" width="320" height="240" autoplay></video>
+<canvas id="canvas" width="320" height="240"></canvas>
+<button id="snap">Snap Photo & Upload</button>
+
+<script>
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => {
+    document.getElementById('video').srcObject = stream;
+  });
+
+document.getElementById('snap').onclick = () => {
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  context.drawImage(document.getElementById('video'), 0, 0, 320, 240);
+  canvas.toBlob(blob => {
+    fetch('http://<ESP32_IP>/upload', {
+      method: 'POST',
+      body: blob
+    }).then(res => res.text()).then(console.log);
+  }, 'image/jpeg');
+};
+</script>
+</body>
+</html>
+
